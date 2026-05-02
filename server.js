@@ -8,11 +8,17 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const { execSync } = require('child_process');
 
 const PORT = 8080;
 const ROOT = __dirname;
 const DB_FILE = path.join(ROOT, 'database.json');
 const PATHS_FILE = path.join(ROOT, 'paths.json');
+const THUMBS_DIR = path.join(ROOT, 'thumbnails');
+
+if (!fs.existsSync(THUMBS_DIR)) {
+  fs.mkdirSync(THUMBS_DIR, { recursive: true });
+}
 
 const VIDEO_EXTS = new Set(['.mp4', '.mkv', '.webm', '.mov', '.avi', '.m4v', '.ogv', '.flv', '.wmv', '.ts']);
 
@@ -125,6 +131,22 @@ function streamVideo(req, res, filePath) {
   }
 }
 
+// ─── Thumbnail generation ───────────────────────────────────────────────
+function generateThumbnail(filePath, vid) {
+  const thumbPath = path.join(THUMBS_DIR, `${vid}.jpg`);
+  if (fs.existsSync(thumbPath)) return true;
+
+  try {
+    // Capture frame at 1 second or 10% of video
+    const cmd = `ffmpeg -ss 00:00:01 -i "${filePath}" -vframes 1 -q:v 2 -vf "scale=320:-1" "${thumbPath}" -y`;
+    execSync(cmd, { stdio: 'ignore' });
+    return true;
+  } catch (e) {
+    console.error('FFmpeg error for', filePath, e.message);
+    return false;
+  }
+}
+
 // ─── Response helpers ──────────────────────────────────────────────────
 function json(res, data, status = 200) {
   const body = JSON.stringify(data);
@@ -231,15 +253,58 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // POST /api/db
-  if (pathname === '/api/db' && method === 'POST') {
-    const body = await readBody(req);
-    writeJSON(DB_FILE, body);
-    json(res, { ok: true });
-    return;
-  }
+    // POST /api/db
+    if (pathname === '/api/db' && method === 'POST') {
+      const body = await readBody(req);
+      writeJSON(DB_FILE, body);
+      json(res, { ok: true });
+      return;
+    }
 
-  // ── Static files ────────────────────────────────────────────────────
+    // POST /api/thumbnails/generate
+    if (pathname === '/api/thumbnails/generate' && method === 'POST') {
+      const { paths } = await readBody(req);
+      if (!paths) { json(res, { error: 'No paths' }, 400); return; }
+
+      let count = 0;
+      for (const p of paths) {
+        const videos = scanDir(p);
+        for (const v of videos) {
+          // We need to replicate the videoId logic here to name the thumb
+          // Or we can just ask the frontend to send a list of (path, name, size, hash)
+          // But let's just use a simple hash here that matches frontend.
+          const key = v.name + ':' + (v.size || 0);
+          let h = 5381;
+          for (let i = 0; i < key.length; i++) {
+            h = ((h << 5) + h) ^ key.charCodeAt(i);
+            h = h >>> 0;
+          }
+          const vid = 'v_' + h.toString(36);
+          if (generateThumbnail(path.join(p, v.name), vid)) {
+            count++;
+          }
+        }
+      }
+      json(res, { ok: true, generated: count });
+      return;
+    }
+
+    // GET /api/thumbnails?vid=...
+    if (pathname === '/api/thumbnails' && method === 'GET') {
+      const vid = query.vid;
+      if (!vid) { res.writeHead(400); res.end('No vid'); return; }
+      const thumbPath = path.join(THUMBS_DIR, `${vid}.jpg`);
+      if (fs.existsSync(thumbPath)) {
+        serveStatic(res, thumbPath);
+      } else {
+        res.writeHead(404);
+        res.end('Not found');
+      }
+      return;
+    }
+
+    // ── Static files ────────────────────────────────────────────────────
+
 
   let staticPath = pathname === '/' ? '/index.html' : pathname;
   staticPath = path.join(ROOT, staticPath);

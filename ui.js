@@ -112,6 +112,7 @@ const UI = (() => {
     return `
       <div class="video-card" data-path="${escapeHtml(path)}" data-name="${escapeHtml(video.name)}">
         <div class="card-thumb" id="thumb-${vid}">
+          <img src="" class="thumb-img hidden" alt="" />
           <div class="card-icon">
             <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
               <polygon points="5 3 19 12 5 21 5 3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)"/>
@@ -138,8 +139,27 @@ const UI = (() => {
   }
 
   function lazyLoadThumbs() {
-    // We can't generate thumbnails without ffmpeg, but we load a quick metadata snippet
-    // Cards already show extension badge as fallback — looks clean
+    document.querySelectorAll('.video-card').forEach(card => {
+      const path = card.dataset.path;
+      const name = card.dataset.name;
+      const vids = State.videos[path] || [];
+      const video = vids.find(v => v.name === name);
+      if (!video) return;
+      
+      const vid = videoId(video);
+      const img = card.querySelector('.thumb-img');
+      const icon = card.querySelector('.card-icon');
+      if (!img || img.getAttribute('src')) return;
+
+      img.src = `${API}/thumbnails?vid=${vid}`;
+      img.onload = () => {
+        img.classList.remove('hidden');
+        if (icon) icon.classList.add('hidden');
+      };
+      img.onerror = () => {
+        // Keep icon as fallback
+      };
+    });
   }
 
   // ─── Player Modal ────────────────────────────────────────────────────
@@ -268,6 +288,31 @@ const UI = (() => {
     render();
   }
 
+  async function generateThumbnails() {
+    const btn = document.getElementById('generateThumbsBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = 'Generating...';
+
+    try {
+      const res = await fetch(`${API}/thumbnails/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paths: State.paths }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        alert(`Successfully generated ${data.generated || 0} thumbnails!`);
+        render();
+      }
+    } catch (e) {
+      alert('Failed to generate thumbnails: ' + e.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+
   // ─── Utils ──────────────────────────────────────────────────────────
   function escapeHtml(str) {
     if (!str) return '';
@@ -305,6 +350,9 @@ const UI = (() => {
     document.getElementById('newPathInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') addPath();
     });
+
+    // Generate thumbnails
+    document.getElementById('generateThumbsBtn').addEventListener('click', generateThumbnails);
 
     // Player close
     document.getElementById('closePlayer').addEventListener('click', closePlayer);
