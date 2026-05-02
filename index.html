@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LocalTube — Your Local Video Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="app.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="bg-[#0a0a0f] text-white min-h-screen font-sans">
+
+  <!-- TOP NAV -->
+  <nav class="fixed top-0 left-0 right-0 z-50 nav-glass border-b border-white/5">
+    <div class="flex items-center justify-between px-6 py-3">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="logo-mark">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#ff3d3d"/>
+            <polygon points="13,10 24,16 13,22" fill="white"/>
+          </svg>
+        </div>
+        <span class="text-xl font-display font-bold tracking-tight">Local<span class="text-[#ff3d3d]">Tube</span></span>
+      </div>
+
+      <!-- Search -->
+      <div class="flex-1 max-w-xl mx-8">
+        <div class="relative">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Search your videos..."
+            class="w-full bg-white/5 border border-white/10 rounded-full px-5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ff3d3d]/50 focus:bg-white/8 transition-all"
+          />
+          <button class="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/70 transition">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right controls -->
+      <div class="flex items-center gap-3">
+        <button id="settingsBtn" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-[#ff3d3d]/50 hover:bg-white/5 text-sm text-white/70 hover:text-white transition-all">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+          Settings
+        </button>
+        <div id="videoCount" class="px-3 py-1.5 rounded-full bg-[#ff3d3d]/10 border border-[#ff3d3d]/20 text-xs text-[#ff3d3d] font-mono font-bold">0 videos</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- SIDEBAR -->
+  <aside class="fixed left-0 top-[57px] bottom-0 w-14 border-r border-white/5 flex flex-col items-center py-4 gap-4 z-40" style="background: rgba(10,10,15,0.9);">
+    <button onclick="filterAll()" id="btn-all" class="sidebar-btn active" title="All Videos">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </button>
+    <button onclick="filterRecent()" id="btn-recent" class="sidebar-btn" title="Recently Added">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    </button>
+    <button onclick="filterLiked()" id="btn-liked" class="sidebar-btn" title="Liked Videos">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    </button>
+    <div class="flex-1"></div>
+    <button id="sidebarSettingsBtn" class="sidebar-btn" title="Settings">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="ml-14 pt-[57px] min-h-screen">
+    <div class="p-8">
+
+      <!-- Hero / Stats bar -->
+      <div id="heroBar" class="mb-8 p-6 rounded-2xl border border-white/5 bg-gradient-to-r from-[#ff3d3d]/10 via-transparent to-transparent hidden">
+        <div class="flex items-center gap-6 flex-wrap">
+          <div>
+            <div class="text-3xl font-display font-bold" id="statTotal">0</div>
+            <div class="text-xs text-white/40 mt-1">Total Videos</div>
+          </div>
+          <div class="w-px h-10 bg-white/10"></div>
+          <div>
+            <div class="text-3xl font-display font-bold text-[#ff3d3d]" id="statFolders">0</div>
+            <div class="text-xs text-white/40 mt-1">Folders</div>
+          </div>
+          <div class="w-px h-10 bg-white/10"></div>
+          <div>
+            <div class="text-3xl font-display font-bold text-yellow-400" id="statLiked">0</div>
+            <div class="text-xs text-white/40 mt-1">Liked</div>
+          </div>
+          <div class="w-px h-10 bg-white/10"></div>
+          <div>
+            <div class="text-3xl font-display font-bold text-blue-400" id="statComments">0</div>
+            <div class="text-xs text-white/40 mt-1">Comments</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No paths state -->
+      <div id="emptyState" class="flex flex-col items-center justify-center py-32 text-center">
+        <div class="w-24 h-24 rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center mb-6">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" class="text-white/20"><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z"/></svg>
+        </div>
+        <h2 class="text-2xl font-display font-bold text-white/50 mb-2">No video folders yet</h2>
+        <p class="text-white/30 text-sm mb-6">Add a folder path in Settings to start browsing your local videos</p>
+        <button id="emptySettingsBtn" class="px-6 py-3 bg-[#ff3d3d] hover:bg-[#ff5555] rounded-full text-sm font-semibold transition-all hover:scale-105">
+          + Add Folder Path
+        </button>
+      </div>
+
+      <!-- Video sections per path -->
+      <div id="videoSections"></div>
+
+    </div>
+  </main>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-box w-full max-w-lg">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-xl font-display font-bold">Settings</h2>
+        <button id="closeSettings" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition text-white/50 hover:text-white">✕</button>
+      </div>
+
+      <!-- Paths -->
+      <div class="mb-6">
+        <h3 class="text-sm font-semibold text-white/60 uppercase tracking-widest mb-3">Video Folder Paths</h3>
+        <div id="pathsList" class="space-y-2 mb-3"></div>
+        <div class="flex gap-2">
+          <input id="newPathInput" type="text" placeholder="/path/to/your/videos" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-[#ff3d3d]/50 transition font-mono" />
+          <button id="addPathBtn" class="px-4 py-2.5 bg-[#ff3d3d] hover:bg-[#ff5555] rounded-xl text-sm font-semibold transition whitespace-nowrap">
+            + Add
+          </button>
+        </div>
+        <p class="text-xs text-white/30 mt-2">Example: /home/user/Movies or /Volumes/Drive/Videos</p>
+      </div>
+
+      <hr class="border-white/10 mb-6" />
+
+      <!-- Server Info -->
+      <div class="mb-6">
+        <h3 class="text-sm font-semibold text-white/60 uppercase tracking-widest mb-3">Server Info</h3>
+        <div class="bg-white/3 border border-white/5 rounded-xl p-4 font-mono text-xs text-white/50 space-y-1">
+          <div>Running on: <span class="text-[#ff3d3d]" id="serverRuntime">detecting...</span></div>
+          <div>Port: <span class="text-white/80">8080</span></div>
+          <div>API: <span class="text-white/80">http://localhost:8080/api</span></div>
+        </div>
+      </div>
+
+      <!-- Supported formats -->
+      <div>
+        <h3 class="text-sm font-semibold text-white/60 uppercase tracking-widest mb-3">Supported Formats</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="tag">mp4</span><span class="tag">mkv</span><span class="tag">webm</span><span class="tag">mov</span><span class="tag">avi</span><span class="tag">m4v</span><span class="tag">ogv</span><span class="tag">flv</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO PLAYER MODAL -->
+  <div id="playerModal" class="modal-overlay hidden">
+    <div class="player-box w-full max-w-5xl">
+      <!-- Close -->
+      <button id="closePlayer" class="absolute top-4 right-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-black/60 hover:bg-black/80 text-white/70 hover:text-white transition">✕</button>
+
+      <!-- Video -->
+      <div class="video-wrapper bg-black rounded-2xl overflow-hidden mb-4 relative">
+        <video id="mainVideo" controls class="w-full max-h-[60vh] object-contain bg-black">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <!-- Info row -->
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div class="flex-1 min-w-0">
+          <h2 id="videoTitle" class="text-xl font-display font-bold truncate mb-1"></h2>
+          <div class="flex items-center gap-3 text-sm text-white/40 flex-wrap">
+            <span id="videoPath" class="font-mono text-xs bg-white/5 px-2 py-0.5 rounded"></span>
+            <span id="videoSize"></span>
+            <span id="videoModified"></span>
+          </div>
+        </div>
+        <!-- Like + Fullscreen -->
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="likeBtn" class="flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:border-red-400/50 hover:text-red-400 text-white/60 transition-all text-sm">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" id="likeIcon"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span id="likeCount">0</span>
+          </button>
+          <button id="fullscreenBtn" class="px-4 py-2 rounded-full border border-white/10 hover:border-white/30 text-white/60 hover:text-white transition-all text-sm flex items-center gap-2">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            Fullscreen
+          </button>
+        </div>
+      </div>
+
+      <hr class="border-white/10 mb-4" />
+
+      <!-- Comments -->
+      <div>
+        <h3 class="text-sm font-semibold text-white/50 uppercase tracking-widest mb-3">Comments <span id="commentCountLabel" class="text-white/30 normal-case font-normal"></span></h3>
+
+        <!-- Add comment -->
+        <div class="flex gap-3 mb-4">
+          <div class="w-8 h-8 rounded-full bg-[#ff3d3d]/20 border border-[#ff3d3d]/30 flex items-center justify-center text-xs text-[#ff3d3d] font-bold shrink-0">U</div>
+          <div class="flex-1">
+            <input id="commentInput" type="text" placeholder="Add a comment..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#ff3d3d]/50 transition" />
+            <div class="flex justify-end mt-2">
+              <button id="submitComment" class="px-4 py-1.5 bg-[#ff3d3d] hover:bg-[#ff5555] rounded-full text-xs font-semibold transition">Post</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comment list -->
+        <div id="commentsList" class="space-y-3 max-h-48 overflow-y-auto pr-1 custom-scroll"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>

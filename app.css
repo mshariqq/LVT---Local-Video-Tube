@@ -1,0 +1,375 @@
+/* ─── Fonts & Base ─────────────────────────── */
+:root {
+  --red: #ff3d3d;
+  --red-dim: rgba(255, 61, 61, 0.15);
+  --surface: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #0a0a0f;
+  scroll-behavior: smooth;
+}
+
+.font-display { font-family: 'Poppins', sans-serif; }
+.font-mono { font-family: 'Lato', monospace; }
+
+/* ─── Nav Glass ───────────────────────────── */
+.nav-glass {
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ─── Sidebar Buttons ─────────────────────── */
+.sidebar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.35);
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+.sidebar-btn:hover {
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.8);
+  border-color: rgba(255,255,255,0.08);
+}
+.sidebar-btn.active {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: rgba(255,61,61,0.25);
+}
+
+/* ─── Video Card ──────────────────────────── */
+.video-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+.video-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255,61,61,0.3);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,61,61,0.1);
+}
+.video-card:hover .card-play {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+.video-card:hover .card-thumb-overlay {
+  opacity: 1;
+}
+
+/* Thumbnail */
+.card-thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0e17 100%);
+  overflow: hidden;
+}
+.card-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.card-thumb video.loaded { opacity: 1; }
+
+.card-thumb-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Play button overlay */
+.card-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255,61,61,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px rgba(255,61,61,0.5);
+}
+
+/* Video icon (when no thumb) */
+.card-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.card-icon svg {
+  color: rgba(255,255,255,0.15);
+}
+.card-icon .ext-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Duration badge */
+.duration-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.8);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+}
+
+/* Card body */
+.card-body {
+  padding: 14px 16px 16px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+}
+.card-size {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+}
+.card-liked-indicator {
+  color: var(--red);
+}
+
+/* ─── Section Header ──────────────────────── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.section-path-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 6px 14px;
+  letter-spacing: -0.01em;
+}
+.section-count {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  font-family: 'Space Mono', monospace;
+}
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* ─── Grid ────────────────────────────────── */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* ─── Modals ──────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 24px;
+  animation: fadeIn 0.15s ease;
+}
+.modal-overlay.hidden { display: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-box {
+  background: #111118;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 24px;
+  padding: 28px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+.player-box {
+  background: #0d0d12;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 24px;
+  padding: 24px;
+  max-height: 95vh;
+  overflow-y: auto;
+  animation: slideUp 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ─── Comments ────────────────────────────── */
+.comment-item {
+  display: flex;
+  gap: 10px;
+  animation: fadeIn 0.2s ease;
+}
+.comment-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+}
+.comment-bubble {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+.comment-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 4px;
+  font-family: 'Space Mono', monospace;
+}
+.comment-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+}
+
+/* ─── Path List in Settings ───────────────── */
+.path-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  animation: fadeIn 0.15s ease;
+}
+.path-item .remove-btn {
+  color: rgba(255,255,255,0.25);
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+.path-item .remove-btn:hover { color: var(--red); }
+
+/* ─── Tag ─────────────────────────────────── */
+.tag {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Like btn active ─────────────────────── */
+.like-active {
+  border-color: rgba(255,61,61,0.5) !important;
+  color: var(--red) !important;
+  background: var(--red-dim);
+}
+.like-active #likeIcon {
+  fill: var(--red);
+  stroke: var(--red);
+}
+
+/* ─── Custom Scrollbar ───────────────────── */
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: transparent; }
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+
+/* ─── Loading spinner ─────────────────────── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--red);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Responsive ──────────────────────────── */
+@media (max-width: 640px) {
+  .video-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .player-box { padding: 16px; border-radius: 16px; }
+}
